@@ -60,22 +60,25 @@ def get_agent_statistics(df, firm_indices):
     if np.any(not_close_to_zero):  # Check if there are any values not close to 0
         average_ending_capital_when_not_bankrupt = np.mean(arr[not_close_to_zero])
     else:
-        average_ending_capital_when_not_bankrupt = None  # or 0, depending on your preference
+        average_ending_capital_when_not_bankrupt = 0.0
     
     return percent_not_bankrupt, average_ending_capital_when_not_bankrupt
     
 
 def main():
-    file_paths = ['C:\\Users\\ARG\\Desktop\\BusinessStrategySimulator2Windows\\BusinessStrategySimulator2Windows\\BusinessSimulator2.0\\MasterOutputFiles\\MasterOutput.csv']
-    starting_capital_amounts = [2000] # We have to supply this information since it isn't explicitly included in the output file
-    firm_id_of_ai_agent_being_trained = [1]
-    firm_ids_of_sophisticated_agents = [0]
-    firm_ids_of_naive_agents = []
+    file_path_start = 'C:\\Users\\ARG\\Desktop\\BusinessStrategySimulator2Windows\\BusinessStrategySimulator2Windows\\BusinessSimulator2.0\\MasterOutputFiles\\MasterOutputMaxDemand'
+    file_path_end = '.csv'
+    file_paths = []
+    for demand_intercept_max in range(6,31):
+        file_paths.append(file_path_start + str(demand_intercept_max) + file_path_end)
+
+    starting_capital_amount = 2000 # We have to supply this information since it isn't explicitly included in the output file
+    firm_id_of_ai_agent_being_trained = [4]
+    firm_ids_of_sophisticated_agents = [0,1]
+    firm_ids_of_naive_agents = [2,3]
 
     for i in range(len(file_paths)):
         file_path = file_paths[i]
-        starting_capital = starting_capital_amounts[i]
-
         dataframe = csv_to_dataframe(file_path)
 
         print("------------------------------------------------")
@@ -84,17 +87,23 @@ def main():
             # Analyze AI agent performance
             if firm_id_of_ai_agent_being_trained:
                 percent_not_bankrupt, average_ending_capital_when_not_bankrupt = get_agent_statistics(dataframe, firm_id_of_ai_agent_being_trained)
-                print(f"The AI agent avoided bankruptcy in {percent_not_bankrupt:.2f} percent of the simulations.\nWhen it avoided bankruptcy, it finished with an average capital of {average_ending_capital_when_not_bankrupt:.2f}.\n")   
+                print(f"The AI agent avoided bankruptcy in {percent_not_bankrupt:.2f} percent of the simulations.")
+                if not math.isclose(percent_not_bankrupt, 0.0, rel_tol=0.0, abs_tol=1e-06):
+                    print(f"When it avoided bankruptcy, it finished with an average capital of {average_ending_capital_when_not_bankrupt:.2f}.")
 
             # Analyze sophisticated agent performance
-            if firm_ids_of_sophisticated_agents:   
+            if firm_id_of_ai_agent_being_trained:
                 percent_not_bankrupt, average_ending_capital_when_not_bankrupt = get_agent_statistics(dataframe, firm_ids_of_sophisticated_agents)
-                print(f"The sophisticated agents avoided bankruptcy in {percent_not_bankrupt:.2f} percent of the simulations.\nWhen they avoided bankruptcy, they finished with an average capital of {average_ending_capital_when_not_bankrupt:.2f}.\n")
+                print(f"\nThe sophisticated agents avoided bankruptcy in {percent_not_bankrupt:.2f} percent of the simulations.")
+                if not math.isclose(percent_not_bankrupt, 0.0, rel_tol=0.0, abs_tol=1e-06):
+                    print(f"When they avoided bankruptcy, they finished with an average capital of {average_ending_capital_when_not_bankrupt:.2f}.")
             
             # Analyze naive agent performance
-            if firm_ids_of_naive_agents:
+            if firm_id_of_ai_agent_being_trained:
                 percent_not_bankrupt, average_ending_capital_when_not_bankrupt = get_agent_statistics(dataframe, firm_ids_of_naive_agents)
-                print(f"The naive agents avoided bankruptcy in {percent_not_bankrupt:.2f} percent of the simulations.\nWhen they avoided bankruptcy, they finished with an average capital of {average_ending_capital_when_not_bankrupt:.2f}.")
+                print(f"\nThe naive agents avoided bankruptcy in {percent_not_bankrupt:.2f} percent of the simulations.")
+                if not math.isclose(percent_not_bankrupt, 0.0, rel_tol=0.0, abs_tol=1e-06):
+                    print(f"When they avoided bankruptcy, they finished with an average capital of {average_ending_capital_when_not_bankrupt:.2f}.")
         print("------------------------------------------------")
             
 
